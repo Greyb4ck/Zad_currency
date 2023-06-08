@@ -1,25 +1,22 @@
 <?php
 class CurrencyAPI {
-    private $conn;
-
+    
     public function __construct($conn) {
         $this->conn = $conn;
     }
     // Function to drop the currency table from the database
     private function dropCurrencyTable() {
-        global $conn;
 
         $sql = "DROP TABLE Currency";
 
         // Drop the 'Currency' table
-        if (!mysqli_query($conn, $sql)) {
-            die('Error deleting Currency table: ' . mysqli_error($conn));
+        if (!mysqli_query($this->conn, $sql)) {
+            die('Error deleting Currency table: ' . mysqli_error($this->conn));
         }
     }
 
     // Function to create the currency table in the database
     private function createCurrencyTable() {
-        global $conn;
 
         // If currency table already exists, return
         if ($this->checkIfCurrencyTableExists()) {
@@ -35,28 +32,27 @@ class CurrencyAPI {
         )";
 
         // Create the 'Currency' table
-        if (!mysqli_query($conn, $sql)) {
-            die('Error creating table: ' . mysqli_error($conn));
+        if (!mysqli_query($this->conn, $sql)) {
+            die('Error creating table: ' . mysqli_error($this->conn));
         }
     }
 
     // Function to insert currency data into the database
     private function insertCurrencyData($rates, $effectiveDate) {
-        global $conn;
 
         foreach ($rates as $rate) {
-            $currency = mysqli_real_escape_string($conn, $rate['currency']);
-            $code = mysqli_real_escape_string($conn, $rate['code']);
+            $currency = mysqli_real_escape_string($this->conn, $rate['currency']);
+            $code = mysqli_real_escape_string($this->conn, $rate['code']);
             $mid = $rate['mid'];
 
             $insertSql = "INSERT INTO Currency (name_currency, code_currency, mid_currency, date_currency) 
                           VALUES ('$currency', '$code', $mid, '$effectiveDate')";
 
             // Insert the currency data into the 'Currency' table
-            if (mysqli_query($conn, $insertSql)) {
+            if (mysqli_query($this->conn, $insertSql)) {
                 //echo "Inserted currency: $currency\n";
             } else {
-                echo "Error inserting currency: " . mysqli_error($conn) . "\n";
+                echo "Error inserting currency: " . mysqli_error($this->conn) . "\n";
             }
         }
     }
@@ -91,10 +87,9 @@ class CurrencyAPI {
     }
     // Fetches currency data from the database.
     public function fetchCurrencyData() {
-        global $conn; 
 
         $sql = "SELECT * FROM Currency";
-        $result = $conn->query($sql);
+        $result = $this->conn->query($sql);
 
         $currencyData = array();
 
@@ -150,8 +145,5 @@ class CurrencyAPI {
 
         return $jsonData;
     }
-
-    
-
 
 }

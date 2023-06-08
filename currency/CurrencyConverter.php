@@ -2,9 +2,11 @@
 class CurrencyConverter {
     private $exchangeRates;
 
-    public function __construct() {
+    public function __construct($conn) {
+        $this->conn = $conn;
         $exchangeRates = $this->fetchExchangeRates();
         $this->exchangeRates = $exchangeRates;
+        
     }
 
     // Fetch exchange rates from the database
@@ -25,10 +27,9 @@ class CurrencyConverter {
     }
     // Fetch currency data from the database
     public function fetchCurrencyData() {
-        global $conn; 
-    
+         
         $sql = "SELECT * FROM Currency";
-        $result = $conn->query($sql);
+        $result = $this->conn->query($sql);
     
         $currencyData = array();
     
@@ -137,7 +138,6 @@ class CurrencyConverter {
     }
     // Create the exchange history table in the database
     public function createExchangeHistoryTable() {
-        global $conn;
 
         if ($this->checkIfExchangeHistoryTableExists()) {
             return;
@@ -151,18 +151,17 @@ class CurrencyConverter {
             convertedAmount DECIMAL(65,4) UNSIGNED
         )";
     
-        if (!mysqli_query($conn, $sql)) {
-            die('Error creating table: ' . mysqli_error($conn));
+        if (!mysqli_query($this->conn, $sql)) {
+            die('Error creating table: ' . mysqli_error($this->conn));
         }
     }
     // Insert exchange history data into the database
     public function insertExchangeHistoryData($fromCurrency, $toCurrency, $amount, $convertedAmount) {
-        global $conn;
     
         $insertSql = "INSERT INTO ExchangeHistory (code_fromCurrency, code_toCurrency, amount, convertedAmount) 
                       VALUES (?, ?, ?, ?)";
     
-        $stmt = $conn->prepare($insertSql);
+        $stmt = $this->conn->prepare($insertSql);
         $stmt->bind_param("ssdd", $fromCurrency, $toCurrency, $amount, $convertedAmount);
     
         if ($stmt->execute()) {
@@ -175,27 +174,24 @@ class CurrencyConverter {
     }
     // Check if the exchange history table exists in the database
     public function checkIfExchangeHistoryTableExists() {
-        global $conn;
     
-        $result = mysqli_query($conn, "SHOW TABLES LIKE 'ExchangeHistory'");
+        $result = mysqli_query($this->conn, "SHOW TABLES LIKE 'ExchangeHistory'");
         return mysqli_num_rows($result) > 0;
     }
     // Drop the exchange history table from the database
     public function dropExchangeHistoryTable() {
-        global $conn;
     
         $sql = "DROP TABLE ExchangeHistory";
     
-        if (!mysqli_query($conn, $sql)) {
-            die('Error deleting ExchangeHistory table: ' . mysqli_error($conn));
+        if (!mysqli_query($this->conn, $sql)) {
+            die('Error deleting ExchangeHistory table: ' . mysqli_error($this->conn));
         }
     }
     // Fetch exchange history data from the database
     public function fetchExchangeHistoryData() {
-        global $conn; 
     
         $sql = "SELECT * FROM ExchangeHistory";
-        $result = $conn->query($sql);
+        $result = $this->conn->query($sql);
     
         $currencyData = array();
     

@@ -7,7 +7,7 @@ require_once '../inc/dbcon.php';
 $currencyAPI = new CurrencyAPI($conn);
 $currencyAPI->getCurrencyTable();
 
-$currencyConverter = new CurrencyConverter();
+$currencyConverter = new CurrencyConverter($conn);
 
 // Handle form submission
 if (isset($_POST['exchange'])) {

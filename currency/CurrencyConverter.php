@@ -1,7 +1,8 @@
 <?php
 class CurrencyConverter {
     private $exchangeRates;
-
+    private $conn;
+    
     public function __construct($conn) {
         $this->conn = $conn;
         $exchangeRates = $this->fetchExchangeRates();
